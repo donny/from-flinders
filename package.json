@@ -1,0 +1,23 @@
+{
+  "name": "from-flinders",
+  "version": "0.0.1",
+  "description": "Show next train departures from Flinders Street Railway Station (Melbourne)",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/donny/from-flinders"
+  },
+  "dependencies": {
+    "chalk": "^0.5.1",
+    "moment-timezone": "^0.2.3",
+    "nomnom": "^1.8.0",
+    "request": "^2.45.0"
+  },
+  "author": "Donny Kurniawan",
+  "license": "MIT",
+  "bin": {
+    "from-flinders": "./bin/from-flinders"
+  }
+}

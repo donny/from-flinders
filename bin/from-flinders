@@ -1,0 +1,117 @@
+#!/usr/bin/env node
+
+var request = require('request');
+var chalk = require('chalk');
+var moment = require('moment-timezone');
+
+var opts = require("nomnom")
+            .option('next', {
+              abbr: 'n',
+              metavar: 'NUM',
+              default: 5,
+              help: 'Show the next NUM departures'
+            })
+            .option('line', {
+              abbr: 'l',
+              metavar: 'NAME',
+              choices: ['Alamein', 'Belgrave', 'Craigieburn', 'Cranbourne', 'Frankston', 'Glen Waverley', 'Hurstbridge', 'Lilydale', 'Pakenham', 'Sandringham', 'South Morang', 'Sunbury', 'Upfield', 'Werribee', 'Williamstown'],
+              default: 'Werribee',
+              list: true,
+              help: 'Show the next departures from line NAME'
+            })
+            .option('json', {
+              abbr: 'j',
+              flag: true,
+              default: false,
+              help: 'Display the data as JSON'
+            })
+              .parse();
+
+var limit = opts.next;
+limit = Math.min(limit, 10);
+
+// Get the data from PTV.
+request('http://ptv.vic.gov.au/transport/direct/chronos.php?stopId=10001071&limit=' + limit + '&mode=0', function(error, response, body) {
+  if (!error && response.statusCode == 200) {
+    var data = JSON.parse(body);
+
+    // Convert and display the time.
+    var localTime = data.time;
+    localTime = localTime.replace(' UTC', '');
+    localTime = moment.tz(localTime, 'UTC');
+    localTime = localTime.tz('Australia/Melbourne');
+
+    if (!opts.json) {
+      console.log(chalk.yellow('🚂  From Flinders') + ' at ' + chalk.red(localTime.format('DD/MM/YYYY, HH:mm:ss')));
+    }
+
+    var results = {};
+
+
+    // Parse the departure data.
+    var values = data.values;
+    for (var i = 0; i < values.length; i++) {
+      var direction = values[i].platform.direction.direction_name;
+      var line = values[i].platform.direction.line.line_name;
+
+      if (direction == line) {
+        if (results[line] == undefined) {
+          results[line] = [];
+        }
+
+        results[line].push(values[i]);
+      }
+    }
+
+    /*
+    var keys = [];
+    for (var key in results) {
+      if (results.hasOwnProperty(key)) {
+        keys.push(key);
+      }
+    }
+    keys.sort();
+    */
+
+    // Only display the data according to the given line names.
+    var keys = [];
+    keys = keys.concat(opts.line);
+
+    var jsonOutput = {};
+
+    for (var i = 0; i < keys.length; i++) {
+      var line = keys[i];
+
+      if (opts.json) {
+        jsonOutput[line] = [];
+      } else {
+        console.log(chalk.green(line));
+      }
+
+      for (var j = 0; j < results[line].length; j++) {
+        var result = results[line][j];
+        var destination = result.run.destination_name;
+        var timetable = result.time_timetable_utc;
+        timetable = moment.tz(timetable, 'UTC');
+        timetable = timetable.tz('Australia/Melbourne');
+
+
+        if (opts.json) {
+          var out = {};
+          out['dest'] = destination;
+          out['time'] = timetable.format('HH:mm:ss');
+          jsonOutput[line].push(out);
+        } else {
+          console.log("\t" + timetable.format('HH:mm:ss') + ' ' + destination);
+        }
+      }
+    }
+
+    if (opts.json) {
+      console.log(jsonOutput);
+    }
+
+  } else {
+    console.error(response.statusCode);
+  }
+});
