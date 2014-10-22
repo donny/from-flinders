@@ -19,13 +19,7 @@ var opts = require("nomnom")
               list: true,
               help: 'Show the next departures from line NAME'
             })
-            .option('json', {
-              abbr: 'j',
-              flag: true,
-              default: false,
-              help: 'Display the data as JSON'
-            })
-              .parse();
+            .parse();
 
 var limit = opts.next;
 limit = Math.min(limit, 10);
@@ -41,9 +35,7 @@ request('http://ptv.vic.gov.au/transport/direct/chronos.php?stopId=10001071&limi
     localTime = moment.tz(localTime, 'UTC');
     localTime = localTime.tz('Australia/Melbourne');
 
-    if (!opts.json) {
-      console.log(chalk.yellow('🚂  From Flinders') + ' at ' + chalk.red(localTime.format('DD/MM/YYYY, HH:mm:ss')));
-    }
+    console.log(chalk.yellow('🚂  From Flinders') + ' at ' + chalk.red(localTime.format('DD/MM/YYYY, HH:mm:ss')));
 
     var results = {};
 
@@ -77,16 +69,10 @@ request('http://ptv.vic.gov.au/transport/direct/chronos.php?stopId=10001071&limi
     var keys = [];
     keys = keys.concat(opts.line);
 
-    var jsonOutput = {};
-
     for (var i = 0; i < keys.length; i++) {
       var line = keys[i];
 
-      if (opts.json) {
-        jsonOutput[line] = [];
-      } else {
-        console.log(chalk.green(line));
-      }
+      console.log(chalk.green(line));
 
       for (var j = 0; j < results[line].length; j++) {
         var result = results[line][j];
@@ -96,19 +82,8 @@ request('http://ptv.vic.gov.au/transport/direct/chronos.php?stopId=10001071&limi
         timetable = timetable.tz('Australia/Melbourne');
 
 
-        if (opts.json) {
-          var out = {};
-          out['dest'] = destination;
-          out['time'] = timetable.format('HH:mm:ss');
-          jsonOutput[line].push(out);
-        } else {
-          console.log("\t" + timetable.format('HH:mm:ss') + ' ' + destination);
-        }
+        console.log("\t" + timetable.format('HH:mm:ss') + ' ' + destination);
       }
-    }
-
-    if (opts.json) {
-      console.log(jsonOutput);
     }
 
   } else {

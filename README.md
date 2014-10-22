@@ -15,7 +15,6 @@ Usage:
     Options:
        -n NUM, --next NUM     Show the next NUM departures  [5]
        -l NAME, --line NAME   Show the next departures from line NAME  [Werribee]
-       -j, --json             Display the data as JSON  [false]
 
     $ from-flinders
     🚂  From Flinders at 22/10/2014, 11:31:41
