@@ -82,7 +82,7 @@ request('http://ptv.vic.gov.au/transport/direct/chronos.php?stopId=10001071&limi
         timetable = timetable.tz('Australia/Melbourne');
 
 
-        console.log("\t" + timetable.format('HH:mm:ss') + ' ' + destination);
+        console.log("\t" + timetable.format('HH:mm') + ' ' + destination);
       }
     }
 

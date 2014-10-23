@@ -1,6 +1,6 @@
 {
   "name": "from-flinders",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Show next train departures from Flinders Street Railway Station (Melbourne)",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
